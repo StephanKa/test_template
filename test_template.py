@@ -16,7 +16,6 @@ import sys
 
 class TestTemplateClass(unittest.TestCase):
 
-
     @classmethod  
     def setUpClass(self):
         pass
