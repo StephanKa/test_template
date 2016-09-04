@@ -21,6 +21,10 @@ class TestTemplateClass(unittest.TestCase):
     def setUpClass(self):
         pass
     
+    @classmethod  
+    def tearDownClass(self):
+        pass
+    
     def setUp(self):
         pass
         
