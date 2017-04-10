@@ -44,7 +44,7 @@ if sys.version_info < (3, 0):
         begin_time = time.time()
         suite = unittest.TestSuite()
         if(len(sys.argv)) < 2:
-            raise Exception('ERROR: A command-line parameter is missing')
+            unittest.main()
         else:
             while(len(sys.argv) > 1):
                 tmp_argument = sys.argv.pop(1)
