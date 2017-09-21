@@ -11,6 +11,8 @@ Example:              python test_template.py TestTemplateClass.test_xxx
 import time
 import unittest
 import sys
+import os
+import xmlrunner
 
 
 class TestTemplateClass(unittest.TestCase):
@@ -37,32 +39,35 @@ if sys.version_info < (3, 0):
     # Note:
     # The loader that sorts the test by their order of definition doesn't
     # work on Python 3.
-    #
-    # TODO:
-    # - test environment for multiple suites
     if __name__ == '__main__':
-        begin_time = time.time()
-        suite = unittest.TestSuite()
+        BEGIN_TIME = time.time()
+        SUITE = unittest.TestSuite()
         if(len(sys.argv)) < 2:
-            unittest.main()
+            if(not os.path.exists('coverage')):
+                os.mkdir('coverage')
+            with open('coverage/test-results.xml', 'wb') as output:
+                unittest.main(testRunner=xmlrunner.XMLTestRunner(output=output),
+                              # these make sure that some options that are not applicable
+                              # remain hidden from the help menu.
+                              failfast=False, buffer=False, catchbreak=False)
         else:
             while(len(sys.argv) > 1):
-                tmp_argument = sys.argv.pop(1)
-                if(tmp_argument[0:2] == '--'):
+                TMP_ARGUMENT = sys.argv.pop(1)
+                if(TMP_ARGUMENT[0:2] == '--'):
                     # add optional parameter here
                     pass
                 else:
                     # split the test method from test class
-                    test_argument = tmp_argument.split('.')
-                    if(len(test_argument) == 2):
-                        test_case = test_argument[0]
-                        test_method = test_argument[1]
-                        suite.addTest((eval(test_case))(test_method))
-                    elif(len(test_argument) == 1):
-                        test_case = test_argument[0]
-                        if(suite != unittest.TestSuite()):
+                    TEST_ARGUMENT = TMP_ARGUMENT.split('.')
+                    if(len(TEST_ARGUMENT) == 2):
+                        TEST_CASE = TEST_ARGUMENT[0]
+                        TEST_METHOD = TEST_ARGUMENT[1]
+                        SUITE.addTest((eval(TEST_CASE))(TEST_METHOD))
+                    elif(len(TEST_ARGUMENT) == 1):
+                        TEST_CASE = TEST_ARGUMENT[0]
+                        if(SUITE != unittest.TestSuite()):
                             raise Exception('ERROR: Cannot have multiple test suites!')
-                        suite = unittest.TestLoader().loadTestsFromTestCase(eval(test_case))
+                        SUITE = unittest.TestLoader().loadTestsFromTestCase(eval(TEST_CASE))
                     else:
                         raise Exception('ERROR: invalid test case specification!')
             # set the test runner with parameters (description, verbosity, stream)
@@ -78,8 +83,11 @@ if sys.version_info < (3, 0):
             runner = unittest.TextTestRunner(descriptions=False, verbosity=2)
             test_res = runner.run(suite)
             print('Time elapsed: {0}sec'.format(time.time - begin_time))
+            RUNNER = unittest.TextTestRunner(descriptions=False, verbosity=2)
+            TEST_RESULTAT = RUNNER.run(SUITE)
+            print('Time elapsed: {0}sec'.format(time.time() - BEGIN_TIME))
             # check for errors or failures and return 0 or 1
-            if((test_res.errors != []) or (test_res.failures != [])):
+            if((TEST_RESULTAT.errors != []) or (TEST_RESULTAT.failures != [])):
                 sys.exit(1)
             else:
                 sys.exit(0)
